@@ -1,0 +1,67 @@
+{
+  "name": "@truyman/hass",
+  "version": "0.1.0",
+  "description": "A Bun-built CLI for Home Assistant",
+  "keywords": [
+    "automation",
+    "cli",
+    "home-assistant",
+    "smart-home"
+  ],
+  "homepage": "https://github.com/bentruyman/home-assistant-cli#readme",
+  "bugs": {
+    "url": "https://github.com/bentruyman/home-assistant-cli/issues"
+  },
+  "license": "Apache-2.0",
+  "author": "Ben Truyman",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bentruyman/home-assistant-cli.git"
+  },
+  "bin": {
+    "hass": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node",
+    "check": "bun run typecheck && bun run lint",
+    "format": "oxfmt && oxlint --fix",
+    "lint": "oxfmt --check && oxlint",
+    "prepare": "husky",
+    "prepublishOnly": "bun run check && bun run build",
+    "release": "release-it",
+    "test": "bun test",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@truyman/cli": "^1.0.2",
+    "kleur": "^4.1.5",
+    "undici": "^7.16.0",
+    "xdg-basedir": "^5.1.0",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "oxfmt": "^0.21.0",
+    "oxlint": "^1.38.0",
+    "release-it": "^19.2.3",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*": [
+      "oxfmt --no-error-on-unmatched-pattern",
+      "oxlint --fix"
+    ]
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
