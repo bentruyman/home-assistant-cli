@@ -147,30 +147,6 @@ Connection precedence is:
 3. Stored auth profile
 4. Built-in defaults
 
-## Migration
-
-| Old CLI                                     | New CLI                                 |
-| ------------------------------------------- | --------------------------------------- |
-| `hass-cli info`                             | `hass server info`                      |
-| `hass-cli config full`                      | `hass server config`                    |
-| `hass-cli config components`                | `hass server components`                |
-| `hass-cli state list`                       | `hass states list`                      |
-| `hass-cli state get light.kitchen`          | `hass states get light.kitchen`         |
-| `hass-cli state edit light.kitchen`         | `hass states set light.kitchen ...`     |
-| `hass-cli state history ...`                | `hass states history ...`               |
-| `hass-cli service list`                     | `hass services list`                    |
-| `hass-cli service call light.turn_on`       | `hass services call light.turn_on`      |
-| `hass-cli event fire custom_event`          | `hass events fire custom_event`         |
-| `hass-cli event watch`                      | `hass events watch`                     |
-| `hass-cli template ...`                     | `hass templates render ...`             |
-| `hass-cli area list`                        | `hass areas list`                       |
-| `hass-cli device assign ...`                | `hass devices assign-area ...`          |
-| `hass-cli entity assign ...`                | `hass entities assign-area ...`         |
-| `hass-cli raw get /api/states`              | `hass api get /api/states`              |
-| `hass-cli raw ws config/area_registry/list` | `hass api ws config/area_registry/list` |
-
-The new CLI intentionally drops the old Supervisor/OS management commands, Docker packaging, network discovery, browser map helpers, and local Jinja rendering.
-
 ## Development
 
 ```bash
@@ -180,4 +156,4 @@ bun test
 bun run build
 ```
 
-Tooling follows the same baseline as the `dev` repo: Bun, `@truyman/cli`, `oxfmt`, `oxlint`, husky, lint-staged, and `release-it`.
+Tooling includes: Bun, `@truyman/cli`, `oxfmt`, `oxlint`, husky, lint-staged, and `release-it`.
