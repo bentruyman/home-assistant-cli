@@ -26,58 +26,62 @@ function captureConsole() {
 }
 
 describe("CLI", () => {
-  const originalFetch = globalThis.fetch;
+  let server: ReturnType<typeof Bun.serve>;
 
   beforeEach(() => {
-    globalThis.fetch = (async (input, init) => {
-      const url = String(input);
+    server = Bun.serve({
+      hostname: "127.0.0.1",
+      port: 0,
+      fetch(request) {
+        const url = request.url;
 
-      if (url.endsWith("/api/states")) {
-        return new Response(
-          JSON.stringify([
-            {
-              entity_id: "sensor.one",
-              state: "on",
-              attributes: { friendly_name: "One" },
-            },
-            {
-              entity_id: "sensor.two",
-              state: "off",
-              attributes: { friendly_name: "Two" },
-            },
-          ]),
-          { status: 200 },
-        );
-      }
+        if (url.endsWith("/api/states")) {
+          return new Response(
+            JSON.stringify([
+              {
+                entity_id: "sensor.one",
+                state: "on",
+                attributes: { friendly_name: "One" },
+              },
+              {
+                entity_id: "sensor.two",
+                state: "off",
+                attributes: { friendly_name: "Two" },
+              },
+            ]),
+            { status: 200 },
+          );
+        }
 
-      if (url.includes("/api/services/light/turn_on")) {
-        expect(init?.method).toBe("POST");
-        return new Response(JSON.stringify([{ entity_id: "light.kitchen", state: "on" }]), {
-          status: 200,
-        });
-      }
+        if (url.includes("/api/services/light/turn_on")) {
+          expect(request.method).toBe("POST");
+          return new Response(JSON.stringify([{ entity_id: "light.kitchen", state: "on" }]), {
+            status: 200,
+          });
+        }
 
-      if (url.endsWith("/api/discovery_info")) {
-        return new Response(
-          JSON.stringify({
-            base_url: "http://ha.local:8123",
-            location_name: "Home",
-            version: "2026.3.0",
-          }),
-          { status: 200 },
-        );
-      }
+        if (url.endsWith("/api/config")) {
+          return new Response(
+            JSON.stringify({
+              external_url: server.url.origin,
+              location_name: "Home",
+              version: "2026.3.0",
+            }),
+            { status: 200 },
+          );
+        }
 
-      if (url.endsWith("/api/")) {
-        return new Response(JSON.stringify({ message: "API running." }), { status: 200 });
-      }
+        if (url.endsWith("/api/")) {
+          return new Response(JSON.stringify({ message: "API running." }), { status: 200 });
+        }
 
-      return new Response(JSON.stringify({ ok: true }), { status: 200 });
-    }) as typeof fetch;
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
+      },
+    });
   });
 
   afterEach(() => {
-    globalThis.fetch = originalFetch;
+    server?.stop(true);
   });
 
   test("prints help from the root command", () => {
@@ -92,7 +96,7 @@ describe("CLI", () => {
     try {
       await hass.run([
         "--server",
-        "http://ha.local:8123",
+        server.url.origin,
         "--token",
         "abc",
         "--output",
@@ -125,7 +129,7 @@ describe("CLI", () => {
     try {
       await hass.run([
         "--server",
-        "http://ha.local:8123",
+        server.url.origin,
         "--token",
         "abc",
         "--output",

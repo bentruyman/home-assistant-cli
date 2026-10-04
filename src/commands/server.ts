@@ -9,12 +9,11 @@ const info = command({
   inherits: GlobalOptions,
   handler: async (_, options) => {
     const client = createClient(options);
-    const data = await client.getDiscoveryInfo();
+    const data = await client.getInfo();
     printOutput(data, options, [
       { header: "BASE_URL", path: "base_url" },
       { header: "LOCATION", path: "location_name" },
       { header: "VERSION", path: "version" },
-      { header: "REQUIRES_API_PASSWORD", path: "requires_api_password" },
     ]);
   },
 });

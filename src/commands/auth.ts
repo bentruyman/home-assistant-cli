@@ -50,7 +50,7 @@ const login = command({
 
     let info: Record<string, unknown> | undefined;
     try {
-      info = await client.getDiscoveryInfo();
+      info = await client.getInfo();
     } catch {
       info = undefined;
     }
@@ -117,7 +117,7 @@ const status = command({
       try {
         const client = createClient(options);
         await client.validate();
-        const info = (await client.getDiscoveryInfo().catch(() => ({}))) as Record<string, unknown>;
+        const info = (await client.getInfo().catch(() => ({}))) as Record<string, unknown>;
         result.valid = true;
         result.location_name = info.location_name;
         result.version = info.version;

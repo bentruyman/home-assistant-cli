@@ -33,8 +33,13 @@ export class HomeAssistantClient {
     return this.#http.request<Record<string, unknown>>({ path: REST_PATHS.api });
   }
 
-  async getDiscoveryInfo(): Promise<Record<string, unknown>> {
-    return this.#http.request<Record<string, unknown>>({ path: REST_PATHS.discoveryInfo });
+  async getInfo(): Promise<Record<string, unknown>> {
+    const config = await this.getConfig();
+    return {
+      base_url: config.external_url || config.internal_url || this.#config.server,
+      location_name: config.location_name,
+      version: config.version,
+    };
   }
 
   async getConfig(): Promise<Record<string, any>> {
