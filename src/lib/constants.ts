@@ -3,7 +3,6 @@ export const DEFAULT_SERVER = "http://localhost:8123";
 export const REST_PATHS = {
   api: "/api/",
   config: "/api/config",
-  discoveryInfo: "/api/discovery_info",
   errorLog: "/api/error_log",
   events: "/api/events",
   historyPeriod: "/api/history/period",

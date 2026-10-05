@@ -44,6 +44,10 @@ hass server info
 - `health`
 - `logs`
 
+`info` reads the authenticated `/api/config` endpoint and reports the instance URL,
+location, and version. Its URL uses the configured external URL, then internal URL,
+then the CLI connection URL. `auth login` and `auth status` use the same metadata.
+
 ### `hass states`
 
 - `list [filter]`

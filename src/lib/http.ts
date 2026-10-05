@@ -1,4 +1,4 @@
-import { Agent } from "undici";
+import { Agent, fetch } from "undici";
 
 import { HttpError } from "./errors.ts";
 import { stripWrappingQuotes } from "./strings.ts";
@@ -50,7 +50,8 @@ export class HttpClient {
       console.error(`[http] ${options.method ?? "GET"} ${url}`);
     }
 
-    const response = await globalThis.fetch(url, {
+    // Keep fetch and its dispatcher on the same Undici version across Node releases.
+    const response = await fetch(url, {
       method: options.method ?? "GET",
       dispatcher: this.#dispatcher,
       headers: {
@@ -59,7 +60,7 @@ export class HttpClient {
       },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal,
-    } as RequestInit & { dispatcher?: Agent });
+    });
 
     const text = await response.text();
 

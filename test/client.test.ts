@@ -68,47 +68,51 @@ class FakeWebSocket {
 }
 
 describe("HomeAssistantClient", () => {
-  const originalFetch = globalThis.fetch;
+  let server: ReturnType<typeof Bun.serve>;
   const originalWebSocket = globalThis.WebSocket;
 
   beforeEach(() => {
-    globalThis.fetch = (async (input, init) => {
-      const url = String(input);
-      if (url.endsWith("/api/")) {
-        return new Response(JSON.stringify({ message: "API running." }), { status: 200 });
-      }
+    server = Bun.serve({
+      hostname: "127.0.0.1",
+      port: 0,
+      fetch(request) {
+        const url = request.url;
+        if (url.endsWith("/api/")) {
+          return new Response(JSON.stringify({ message: "API running." }), { status: 200 });
+        }
 
-      if (url.endsWith("/api/states")) {
-        return new Response(
-          JSON.stringify([
-            { entity_id: "light.kitchen", state: "on" },
-            { entity_id: "light.office", state: "off" },
-          ]),
-          { status: 200 },
-        );
-      }
+        if (url.endsWith("/api/states")) {
+          return new Response(
+            JSON.stringify([
+              { entity_id: "light.kitchen", state: "on" },
+              { entity_id: "light.office", state: "off" },
+            ]),
+            { status: 200 },
+          );
+        }
 
-      if (url.includes("/api/services/light/turn_on")) {
-        expect(init?.method).toBe("POST");
-        return new Response(JSON.stringify([{ entity_id: "light.kitchen", state: "on" }]), {
-          status: 200,
-        });
-      }
+        if (url.includes("/api/services/light/turn_on")) {
+          expect(request.method).toBe("POST");
+          return new Response(JSON.stringify([{ entity_id: "light.kitchen", state: "on" }]), {
+            status: 200,
+          });
+        }
 
-      return new Response(JSON.stringify({ url }), { status: 200 });
-    }) as typeof fetch;
+        return new Response(JSON.stringify({ url }), { status: 200 });
+      },
+    });
 
     globalThis.WebSocket = FakeWebSocket as unknown as typeof WebSocket;
   });
 
   afterEach(() => {
-    globalThis.fetch = originalFetch;
+    server?.stop(true);
     globalThis.WebSocket = originalWebSocket;
   });
 
   test("calls REST endpoints", async () => {
     const client = new HomeAssistantClient({
-      server: "http://ha.local:8123",
+      server: server.url.origin,
       token: "abc",
       timeoutSeconds: 10,
       insecure: false,
@@ -124,7 +128,7 @@ describe("HomeAssistantClient", () => {
 
   test("calls websocket registry endpoints", async () => {
     const client = new HomeAssistantClient({
-      server: "http://ha.local:8123",
+      server: server.url.origin,
       token: "abc",
       timeoutSeconds: 10,
       insecure: false,
